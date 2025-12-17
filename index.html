@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flappy Bird Game</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="screen">
+    <div class="container">
+        <div class="form-container">
+            <h2>Enter Username to Play</h2>
+            <input type="text" id="username" placeholder="Enter username">
+            <button onclick="login()">Enter</button>
+        </div>
+    </div>
+</div>
+
+<!-- MENU -->
+<div id="menuScreen" class="screen hidden">
+    <div class="container">
+        <div class="menu-container">
+            <h2>Flappy<br>
+           ✈️Plane✈️</h2>
+            <div class="button-group">
+                <button onclick="startGame()" class="menu-btn primary">Play</button>
+                <button onclick="showLeaderboard()" class="menu-btn secondary">Leaderboard</button>
+                <button onclick="logout()" class="menu-btn logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboardScreen" class="screen hidden">
+    <div class="container">
+        <div class="leaderboard-container">
+            <h2>🏆 Leaderboard</h2>
+            <p class="subtitle">Top 5 Players</p>
+            
+            <div class="leaderboard-content">
+                <ol id="leaderboardList"></ol>
+            </div>
+            
+            <div class="button-container">
+                <button onclick="backToMenu()" class="back-btn">Back to Menu</button>
+                <!-- <button onclick="confirmClearLeaderboard()" class="clear-btn">Clear All Scores</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GAME -->
+<div id="gameScreen" class="hidden">
+    <div class="background"></div>
+    <img src="images/Bird.png" class="bird" id="bird-1">
+    <div class="message"></div>
+    <div class="score">
+        <span class="score_title"></span>
+        <span class="score_val"></span>
+    </div>
+</div>
+
+</body>
+<script>
+    // Your existing function to clear the display
+function clearLeaderboardDisplay() {
+    document.getElementById('leaderboardList').innerHTML = '';
+    
+    // Also clear personal best if you have that container
+    const personalBestContainer = document.getElementById('personalBestContainer');
+    if (personalBestContainer) {
+        personalBestContainer.innerHTML = '';
+    }
+}
+
+// Function to clear all data from localStorage
+function clearLeaderboardData() {
+    // Check and remove all possible score storage keys
+    const scoreKeys = ['leaderboard', 'scores', 'highScores', 'playerScores', 'gameScores'];
+    
+    scoreKeys.forEach(key => {
+        if (localStorage.getItem(key)) {
+            localStorage.removeItem(key);
+            console.log(`Removed ${key} from storage`);
+        }
+    });
+    
+    // Clear the display
+    clearLeaderboardDisplay();
+    
+    // Show empty state message
+    const leaderboardList = document.getElementById('leaderboardList');
+    leaderboardList.innerHTML = `
+        <li style="text-align: center; padding: 40px 20px; color: #aaa; font-style: italic;">
+            <div style="font-size: 24px; margin-bottom: 10px;">📊</div>
+            No scores yet<br>
+            <span style="font-size: 0.8em;">Play the game to add your score!</span>
+        </li>
+    `;
+}
+
+// Confirmation function (safer - prevents accidental clearing)
+function confirmClearLeaderboard() {
+    // Create a custom modal/confirmation
+    if (confirm("⚠️ WARNING: Are you sure you want to clear ALL leaderboard scores?\n\nThis action cannot be undone!")) {
+        clearLeaderboardData();
+        
+        // Optional: Show a temporary success message
+        showNotification("All scores have been cleared!", "success");
+    }
+}
+
+// Optional: Fancy notification function
+function showNotification(message, type = "info") {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: ${type === 'success' ? '#2ecc71' : '#e74c3c'};
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        font-weight: bold;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+
+</script>
+</html>
